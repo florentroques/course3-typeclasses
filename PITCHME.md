@@ -21,7 +21,6 @@ def print(implicit s: String) = println(s)
 print("Hello ESIPE") // prints "Hello ESIPE"
 print // prints "my first implicit parameter"
 ```
-
 - Résolution par type
 - Résolution à la compilation
 
@@ -37,7 +36,6 @@ def print(implicit s: String) = println(s)
 print("Hello ESIPE") // prints "Hello ESIPE"
 print // does not compile
 ```
-
 - Aucune valeur éligible
 
 ---
@@ -53,7 +51,6 @@ def print(implicit s: String) = println(s)
 print("Hello ESIPE") // prints "Hello ESIPE"
 print // does not compile
 ```
-
 - Plusieurs valeurs éligibles
 
 ---
@@ -70,7 +67,6 @@ object Implicits {
 import Implicits._
 println("hello esipe".capitalizeEachWord) // prints Hello Esipe
 ```
-
 - Ajoute des méthodes sur des types existants
 
 ---
@@ -89,7 +85,6 @@ println("hello esipe".some) // prints Some("hello esipe")
 println(3.some) // prints Some(3)
 println(true.some) // prints Some(true)
 ```
-
 - Ajoute des méthodes sur des types génériques
 
 ---
@@ -103,7 +98,6 @@ def print(s: String) = println(s)
 
 print(4) // prints "4"
 ```
-
 - A utiliser avec précaution
 
 ---
@@ -118,7 +112,6 @@ def show[A](a: A)(implicit ev: Show[A]) = println(a)
 show(3) // does not compile
 show(true) // does not compile
 ```
-
 - show a besoin d'un implicit Show[A]
 
 ---
@@ -177,7 +170,6 @@ Every other use of implicits is an example of implicit abuse—including implici
 ---
 
 # Typeclasses
-
 - Implémenté pour la première fois dans Haskell
 - Repose sur la preuve par les types
 - Implémentation d'un polymorphisme ad-hoc
@@ -246,7 +238,6 @@ print(Person("Charles", 23))
 ---
 
 ## Polymorphisme ad-hoc avec la POO
-
 - Doit être implémenté à la création du type
 - Compliqué à implémenter pour les types existants
 - Compliqué d'implémenter un autre comportement
@@ -257,7 +248,6 @@ print(Person("Charles", 23))
 
 # Typeclasses
 ## Comment ?
-
 ```scala
 trait Show[T] {
   def show(t: T): String
@@ -323,12 +313,16 @@ object Person {
     def show(p: Person) = s"${p.name} -> ${p.age}"
   }
 }
+
+def print[T](t: T)(implicit ev: Show[T]) = ev.show(t)
+
+print(Car("Renault", 5))
+print(Person("Charles", 23))
 ```
 
 ---
 
 ## Typeclasses
-
 - ~~Doit être implémenté à la création du type~~
 - Peut être implémenté à tout moment
 - ~~Compliqué à implémenter pour les types existants~~
@@ -369,3 +363,129 @@ Show[Int].show(1)
 ```
 
 ---
+
+## Dérivation de typeclasses
+Est-il possible, à partir d'une instance de **Show[T]**, de déduire une instance de **Show[Option[T]]** ?
+
+---
+
+## Dérivation de typeclasses
+```scala
+trait Show[T] {
+  def show(t: T): String
+}
+
+object Show {
+  def OptionShow[T](implicit ev: Show[T]): Show[Option[T]] = new Show[Option[T]] {
+    def show(o: Option[T]) = o match {
+      case Some(t) => s"Value is ${ev.show(t)}"
+      case None => "Nothing here"
+    }
+  }
+}
+```
+
+---
+
+## Dérivation de typeclasses
+Est-il possible, à partir d'une instance de **Show[T]**, de déduire une instance de **Show[(T, T)]** ?
+
+---
+
+## Dérivation de typeclasses
+```scala
+trait Show[T] {
+  def show(t: T): String
+}
+
+object Show {
+  def TupleShow[T](implicit ev: Show[T]): Show[(T, T)] = new Show[(T, T)] {
+    def show(t: (T, T)) = s"(${ev.show(t._1)}, ${ev.show(t._2)})"
+  }
+}
+```
+
+---
+
+# Typeclasses couramment utilisés
+## Eq
+```scala
+trait Eq[T] {
+  def ===(a: T, b: T): Boolean
+}
+
+def eq[V: Eq](a: V, b: V): Boolean = implicitly[Eq[V]].===(a, b)
+
+object Eq {
+  implicit val IntEq = new Eq[Int] {
+    def ===(a: Int, b: Int) = a == b
+  }
+}
+```
+
+---
+
+## Eq
+### Typeclasses et extension de méthodes
+```scala
+trait Eq[T] {
+  def ===(a: T, b: T): Boolean
+}
+
+object Eq {
+  implicit val IntEq = new Eq[Int] {
+    def ===(a: Int, b: Int) = a == b
+  }
+  implicit class EqPlus[V: Eq](val a: V) {
+    def ===(b: V): Boolean = implicitly[Eq[V]].===(a, b)
+  }
+}
+
+import Eq.EqPlus
+import Eq.IntEq
+println(4 === 6) // prints "false"
+println(10 === 10) // prints "true"
+```
+
+---
+
+# Typeclasses et type constructor
+## Functor
+A partir d'une fonction **A => B**, et d'un Type Constructor **F[_]**, est-il possible d'en déduire une fonction **F[A] => F[B]** ?
+
+---
+
+# Typeclasses et type constructor
+## Functor
+```scala
+trait Functor[F[_]] {
+  def map[A, B](f: A => B)(fa: F[A]): F[B]
+}
+```
+
+---
+
+## Functor
+```scala
+trait Functor[F[_]] {
+  def map[A, B](f: A => B)(fa: F[A]): F[B]
+}
+object Functor {
+  implicit val OptionFunctor = new Functor[Option] {
+    def map[A, B](f: A => B)(fa: Option[A]) = fa match {
+      case Some(x) => Some(f(x))
+      case None => None
+    }
+  }
+}
+
+def transform[F[_]: Functor, A, B](fa: F[A])(f: A => B) = implicitly[Functor[F]].map(f)(fa)
+
+import Functor.OptionFunctor
+println(transform(Option(5))(x => x + 10)) // prints "Some(15)"
+```
+
+---
+
+# Typeclasses couramment utilisés
+## Monad
