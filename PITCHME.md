@@ -533,6 +533,3 @@ object Functor {
 ```
 
 ---
-
-## Typeclasses couramment utilisés
-### Monad
