@@ -518,6 +518,7 @@ println(transform(right(5))(x => x + 10)) // prints "Right(15)"
 ---
 
 ### Unification partielle
+```scala
 trait Functor[F[_]] {
   def map[A, B](f: A => B)(fa: F[A]): F[B]
 }
@@ -529,6 +530,7 @@ object Functor {
     }
   }
 }
+```
 
 ---
 
