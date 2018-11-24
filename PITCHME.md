@@ -165,6 +165,17 @@ show(true) // compiles
 
 ---
 
+There are only two reasonable uses of implicits:
+
+- Extension methods
+- Type class instances
+
+Every other use of implicits is an example of implicit abuse—including implicit conversions, implicit "configuration", implicit execution contexts (the cause of many thread pool bugs in Scala applications), and so forth. Implicit abuse makes working with large code bases extremely challenging, and scares larger companies away from using Scala.
+
+**John De Goes**
+
+---
+
 # Typeclasses
 
 - Implémenté pour la première fois dans Haskell
