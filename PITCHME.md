@@ -407,8 +407,8 @@ object Show {
 
 ---
 
-# Typeclasses couramment utilisés
-## Eq
+## Typeclasses couramment utilisés
+### Eq
 ```scala
 trait Eq[T] {
   def ===(a: T, b: T): Boolean
@@ -449,14 +449,14 @@ println(10 === 10) // prints "true"
 
 ---
 
-# Typeclasses et type constructor
-## Functor
+## Typeclasses et type constructor
+### Functor
 A partir d'une fonction **A => B**, et d'un Type Constructor **F[_]**, est-il possible d'en déduire une fonction **F[A] => F[B]** ?
 
 ---
 
-# Typeclasses et type constructor
-## Functor
+## Typeclasses et type constructor
+### Functor
 ```scala
 trait Functor[F[_]] {
   def map[A, B](f: A => B)(fa: F[A]): F[B]
@@ -465,7 +465,7 @@ trait Functor[F[_]] {
 
 ---
 
-## Functor
+### Functor
 ```scala
 trait Functor[F[_]] {
   def map[A, B](f: A => B)(fa: F[A]): F[B]
@@ -487,5 +487,5 @@ println(transform(Option(5))(x => x + 10)) // prints "Some(15)"
 
 ---
 
-# Typeclasses couramment utilisés
-## Monad
+## Typeclasses couramment utilisés
+### Monad
