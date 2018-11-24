@@ -487,5 +487,50 @@ println(transform(Option(5))(x => x + 10)) // prints "Some(15)"
 
 ---
 
+### Functor
+#### Unification partielle
+Les constructeurs de types F[_] sont éligibles pour être des foncteurs, mais qu'en est-il des constructeurs de types F[_, _], comme Either
+
+---
+
+### Unification partielle
+```scala
+trait Functor[F[_]] {
+  def map[A, B](f: A => B)(fa: F[A]): F[B]
+}
+object Functor {
+  type StringEither[A] = Either[String, A]
+  implicit val StringEitherFunctor = new Functor[StringEither] {
+    def map[A, B](f: A => B)(fa: StringEither[A]): StringEither[B] = fa match {
+      case Right(x) => Right(f(x))
+      case Left(v) => Left(v)
+    }
+  }
+}
+
+def right[A](v: A): Either[String, A] = Right(v)
+def transform[F[_]: Functor, A, B](fa: F[A])(f: A => B) = implicitly[Functor[F]].map(f)(fa)
+
+import Functor.StringEitherFunctor
+println(transform(right(5))(x => x + 10)) // prints "Right(15)"
+```
+
+---
+
+### Unification partielle
+trait Functor[F[_]] {
+  def map[A, B](f: A => B)(fa: F[A]): F[B]
+}
+object Functor {
+  implicit def EitherFunctor[A] = new Functor[({type λ[α] = Either[A, α]})#λ] {
+    def map[B, C](f: B => C)(fa: Either[A, B]): Either[A, C] = fa match {
+      case Right(x) => Right(f(x))
+      case Left(v) => Left(v)
+    }
+  }
+}
+
+---
+
 ## Typeclasses couramment utilisés
 ### Monad
