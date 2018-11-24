@@ -489,7 +489,7 @@ println(transform(Option(5))(x => x + 10)) // prints "Some(15)"
 
 ### Functor
 #### Unification partielle
-Les constructeurs de types F[_] sont éligibles pour être des foncteurs, mais qu'en est-il des constructeurs de types F[_, _], comme Either
+Les constructeurs de types F[\_] sont éligibles pour être des foncteurs, mais qu'en est-il des constructeurs de types F[\_, \_], comme Either
 
 ---
 
