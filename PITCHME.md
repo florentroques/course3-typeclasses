@@ -173,7 +173,8 @@ show(true) // compiles
 
 ---
 
-# Pourquoi les typeclasses
+# Typeclasses
+## Pourquoi ?
 ```scala
 case class Car(name: String, wheelCount: Int)
 
@@ -225,20 +226,135 @@ case class Person(name: String, age: Int) extends Showable {
   def show = s"${this.name} -> ${this.age}"
 }
 
-def show[T <: Showable](t: T): String = t.show
+def print[T <: Showable](t: T): String = t.show
 
-show(Car("Renault", 5))
-show(Person("Mathieu", 31))
+print(Car("Renault", 5))
+print(Person("Charles", 23))
 ```
 
 ---
 
-## Polymorphisme ad-hoc
+## Polymorphisme ad-hoc avec la POO
 
 - Doit être implémenté à la création du type
 - Compliqué à implémenter pour les types existants
 - Compliqué d'implémenter un autre comportement
 - Complexifie la hiérarchie de types
 - Mélange technique et métier
+
+---
+
+# Typeclasses
+## Comment ?
+
+```scala
+trait Show[T] {
+  def show(t: T): String
+}
+
+def print[T](t: T)(implicit ev: Show[T]) = ev.show(t) // def print[T: Show](t: T)
+
+print("ESIPE") // does not compile
+print(true) // does not compile
+print(4) // does not compile
+```
+
+---
+
+```scala
+trait Show[T] {
+  def show(t: T): String
+}
+
+object Show {
+  implicit val StringShow = new Show[String] {
+    def show(s: String) = s
+  }
+  
+  implicit val BooleanShow = new Show[Boolean] {
+    def show(b: Boolean) = if (b) "yes" else "no"
+  }
+  
+  implicit val IntShow = new Show[Int] {
+    def show(i: Int) = i.toString
+  }
+}
+
+def print[T](t: T)(implicit ev: Show[T]) = ev.show(t)
+
+import Show.IntShow
+print("ESIPE") // prints "ESIPE"
+
+import Show.BooleanShow
+print(true) // prints "yes"
+
+import Show.IntShow
+print(4) // prints "4"
+```
+
+---
+
+```scala
+trait Show[T] {
+  def show(t: T): String
+}
+
+case class Car(name: String, wheelCount: Int)
+object Car {
+  implicit val Show = new Show[Car] {
+    def show(c: Car) = s"${c.name} -> ${c.wheelCount}"
+  }
+}
+
+case class Person(name: String, age: Int)
+object Person {
+  implicit val Show = new Show[Person] {
+    def show(p: Person) = s"${p.name} -> ${p.age}"
+  }
+}
+```
+
+---
+
+## Polymorphisme ad-hoc par typeclasses
+
+- ~~Doit être implémenté à la création du type~~
+- Peut être implémenté à tout moment
+- ~~Compliqué à implémenter pour les types existants~~
+- Facile à implémenter pour les types existants
+- ~~Compliqué d'implémenter un autre comportement~~
+- Facile d'implémenter de multiples instances
+- ~~Complexifie la hiérarchie de types~~
+- Ne touche pas la hiérarchie de types
+- ~~Mélange technique et métier~~
+- Séparation nette entre technique et métier
+
+---
+
+## Sucre syntaxique
+```scala
+trait Show[T] {
+  def show(t: T): String
+}
+
+def print[T: Show](t: T) = implicitly[Show[T]].show(t)
+
+// def implicitly[T](implicit e: T): T
+```
+
+---
+
+## Summoner pattern
+```scala
+trait Show[T] {
+  def show(t: T): String
+}
+
+object Show {
+  def apply[T](implicit ev: Show[T]) = ev
+}
+
+Show[Int].show(1)
+```
 
 ---
