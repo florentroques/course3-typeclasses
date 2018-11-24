@@ -316,7 +316,7 @@ object Person {
 
 ---
 
-## Polymorphisme ad-hoc par typeclasses
+## Typeclasses
 
 - ~~Doit être implémenté à la création du type~~
 - Peut être implémenté à tout moment
