@@ -3,7 +3,7 @@ package fr.upem.course3.typeclasses
 object Transform {
 
   // TODO Define typeclass Functor
-  trait Functor[T]
+  trait Functor[F[_]]
 
   // TODO Implement instances according to the unit tests
 
