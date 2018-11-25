@@ -5,6 +5,7 @@ import fr.upem.course3.model.Bank.Account
 import org.scalacheck.Arbitrary
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{FlatSpec, Matchers}
+import Sort._
 
 class SortSpec extends FlatSpec with Matchers with GeneratorDrivenPropertyChecks {
 
