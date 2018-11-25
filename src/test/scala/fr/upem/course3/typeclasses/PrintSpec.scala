@@ -38,7 +38,7 @@ class PrintSpec extends FlatSpec with Matchers with GeneratorDrivenPropertyCheck
     Print.print(Option.empty[Account]) should be(s"Nothing here")
   }
 
-  "print" should "print a positive bank account" in {
+  "print" should "print a positive (some) bank account" in {
     forAll { n: String =>
       val balance = 100
       val account = Option(Bank.Account(Account.Number(n), balance))
