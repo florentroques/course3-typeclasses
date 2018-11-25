@@ -242,7 +242,7 @@ print(Person("Charles", 23))
 - Compliqué à implémenter pour les types existants
 - Compliqué d'implémenter un autre comportement
 - Complexifie la hiérarchie de types
-- Mélange technique et métier
+- Mélange les responsabilités
 
 ---
 
@@ -277,7 +277,7 @@ object Show {
   }
   
   implicit val IntShow = new Show[Int] {
-    def show(i: Int) = i.toString
+    def show(i: Int) = Integer.toString(i)
   }
 }
 
@@ -331,8 +331,8 @@ print(Person("Charles", 23))
 - Facile d'implémenter de multiples instances
 - ~~Complexifie la hiérarchie de types~~
 - Ne touche pas la hiérarchie de types
-- ~~Mélange technique et métier~~
-- Séparation nette entre technique et métier
+- ~~Mélange les responsabilités~~
+- Séparation nette entre les responsabilités
 
 ---
 
@@ -445,6 +445,7 @@ import Eq.EqPlus
 import Eq.IntEq
 println(4 === 6) // prints "false"
 println(10 === 10) // prints "true"
+println(10 === "10") // does not compile
 ```
 
 ---
