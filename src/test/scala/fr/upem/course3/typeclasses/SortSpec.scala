@@ -2,10 +2,11 @@ package fr.upem.course3.typeclasses
 
 import fr.upem.course3.model.Bank
 import fr.upem.course3.model.Bank.Account
-import org.scalacheck.Arbitrary
+import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{FlatSpec, Matchers}
 import Sort._
+import fr.upem.course3.model.Bank.Account.Number
 
 class SortSpec extends FlatSpec with Matchers with GeneratorDrivenPropertyChecks {
 
@@ -18,7 +19,11 @@ class SortSpec extends FlatSpec with Matchers with GeneratorDrivenPropertyChecks
   }
 
   // TODO Implement random generator to inject accounts into the test below. You don't have to modify the test !
-  implicit lazy val accountArb: Arbitrary[Account] = ???
+  implicit lazy val accountArb: Arbitrary[Account] = Arbitrary(
+    Gen
+      .chooseNum(Int.MinValue, Int.MaxValue)
+      .flatMap(balance => Account(Number("test account"), balance))
+  )
 
   "sort" should "sort bank account list with account generation" in {
     forAll { accounts: List[Account] =>
