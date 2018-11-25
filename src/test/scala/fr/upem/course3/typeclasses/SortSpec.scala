@@ -12,7 +12,7 @@ class SortSpec extends FlatSpec with Matchers with GeneratorDrivenPropertyChecks
     forAll { balances: List[Int] =>
       val accounts = balances.map(b => Bank.Account(Account.Number(), b))
 
-      AndThen.sort(accounts).map(_.balance) should contain theSameElementsInOrderAs balances.sorted
+      Sort.sort(accounts).map(_.balance) should contain theSameElementsInOrderAs balances.sorted
     }
   }
 
@@ -21,7 +21,7 @@ class SortSpec extends FlatSpec with Matchers with GeneratorDrivenPropertyChecks
 
   "sort" should "sort bank account list with account generation" in {
     forAll { accounts: List[Account] =>
-      AndThen.sort(accounts).map(_.balance) should contain theSameElementsInOrderAs accounts.map(_.balance).sorted
+      Sort.sort(accounts).map(_.balance) should contain theSameElementsInOrderAs accounts.map(_.balance).sorted
     }
   }
 
