@@ -534,3 +534,71 @@ object Functor {
 ```
 
 ---
+
+## Typeclasses couramment utilisés
+### FlatMap
+```scala
+trait FlatMap[F[_]] {
+  def flatMap[A, B](f: A => F[B])(fa: F[A]): F[B]
+}
+```
+
+---
+
+### FlatMap
+```scala
+trait FlatMap[F[_]] {
+  def flatMap[A, B](f: A => F[B])(fa: F[A]): F[B]
+}
+
+object FlatMap {
+  implicit val OptionFlatMap = new FlatMap[Option] {
+    def flatMap[A, B](f: A => Option[B])(fa: Option[A]) = fa match {
+      case Some(x) => f(x)
+      case None => None
+    }
+  }
+  implicit class FlatMapPlus[F[_]: FlatMap, A](val fa: F[A]) {
+    def ~>[B](f: A => F[B]): F[B] = implicitly[FlatMap[F]].flatMap(f)(fa)
+  }
+}
+
+import FlatMap._
+
+Option(5) ~> (x => Option(x + 10) ~> (y => Option(x + y)))
+```
+
+---
+
+### FlatMap
+```scala
+final case class School(name: String, city: Option[String])
+final case class Student(name: String, school: Option[School])
+
+object Member {
+  def getStudentByName(name: String): Option[Student] = ???
+  def getSchoolForStudent(s: Student): Option[School] = ???
+  def isParisSchool(s: School): Option[Boolean] = ???
+}
+
+import Member._
+getStudentByName("Charles") ~> (st => getSchoolForStudent(st) ~> (sc => isParisSchool(sc)))
+```
+
+---
+
+### FlatMap
+#### Sucre syntaxique
+```scala
+for {
+  st <- getStudentByName("Charles")
+  sc <- getSchoolForStudent(st)
+  isParis <- isParisSchool(sc)
+} yield isParis
+```
+- FlatMap permet d'écrire nos programmes séquentiellement
+
+---
+
+# Fin
+Merci de votre attention
